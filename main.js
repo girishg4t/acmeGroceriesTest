@@ -1,17 +1,18 @@
 
-const { textToJSON, getTotal, createCsv, getkey } = require('./utils')
-const { filterGroceryBy, mapDataBy, formatData } = require('./lib')
+const { textToJSON, getTotal, createCsv } = require('./utils')
+const { filterGroceryBy, mapDataBy, formatData, mergeData } = require('./lib')
 const sortBy = require('lodash.sortby');
 const store = require('store')
-
+const XLSX = require('xlsx')
 const fs = require('fs');
-let key = "";
 const readline = require("readline");
+
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
-var recursiveAsyncReadLine = function () {
+
+const recursiveAsyncReadLine = function () {
     rl.question(`Type one of the options :\n
     ingest <filename>\n 
     summary <category name> <year> <month>\n
@@ -19,26 +20,44 @@ var recursiveAsyncReadLine = function () {
     exit\n\n? `
         , function (line) {
             let values = line.split(" ")
-            switch (values[0]) {
+            switch (values[0].trim()) {
                 case "ingest": {
-                    const file = fs.readFileSync(values[1]).toString();
-                    const isError = doIngest(file)
-                    if (isError) {
-                        console.log("Error")
+                    const e = values[1].split(".")
+                    let extention = e[e.length - 1]
+                    let recentData = "";
+                    if (extention == "xlsx") {
+                        var workbook = XLSX.readFile(values[1]);
+                        recentData = XLSX.utils.sheet_to_json(workbook.Sheets["Sales"]);
                     } else {
-                        console.log("Success")
+                        const fileData = fs.readFileSync(values[1]).toString();
+                        let lines = fileData.split("\n");
+                        const headers = lines[0].split("\t");
+                        recentData = textToJSON(headers, lines.slice(1, lines.length - 1));
                     }
+                    if (recentData == null) {
+                        console.log("Error")
+                        break
+                    }
+                    if (store.get("data")) {
+                        let finalData = mergeData(store.get("data"), recentData)
+                        store.set("data", finalData)
+                    } else {
+                        store.set("data", recentData)
+                    }
+                    console.log("Success")
                     break;
                 }
                 case "summary": {
                     const result = getSummary(values.splice(1, values.length));
+                    if (result.grossSales == 0 && result.totalUnits == 0) {
+                        console.log("No data available")
+                        break
+                    }
                     console.log(`Produce - Total Units: ${result.totalUnits} , Total Gross Sales: ${result.grossSales.toFixed(2)}`)
                     break;
                 }
-                case "generate_report": {
-                    const name = Date.now() + ".csv"
-                    generateRepot(name)
-                    console.log(name)
+                case "generate_report": {                   
+                    generateRepot(values[1])
                     break;
                 }
                 case "exit":
@@ -58,24 +77,8 @@ rl.on("close", function () {
     process.exit(0);
 });
 
-function doIngest(data) {
-    let lines = data.split("\n");
-    const headers = lines[0].split("\t");
-    key = getkey(headers)
-    if (store.get(key)) {
-        return false
-    }
-    let result = textToJSON(headers, lines.slice(1, lines.length - 1));
-
-
-    if (result) {
-        store.set(key, result)
-        return false
-    }
-    return true
-}
 function getSummary(values) {
-    let filteredGrocery = filterGroceryBy(store.get(key),
+    let filteredGrocery = filterGroceryBy(store.get("data"),
         { "Section": values[0] });
 
     let year = values[1]
@@ -97,12 +100,9 @@ function getSummary(values) {
 
 
 function generateRepot(name) {
-    let mappedData = formatData(store.get(key))
-
+    let mappedData = formatData(store.get("data"))
     let filteredData = sortBy(mappedData, ["SKU", "Year", "Month"])
-
     const fields = ['Year', 'Month', 'SKU', 'Category', 'Units', 'GrossSales'];
-
     createCsv(filteredData, name, { fields })
 }
 
