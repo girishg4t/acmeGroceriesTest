@@ -11,7 +11,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/textToJSON.js"
+            "program": "${workspaceFolder}/test.js"
         }
     ]
 }
