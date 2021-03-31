@@ -24,12 +24,7 @@ function textToJSON(headers, lines) {
     }
     return result;
 }
-function checkIfDataExists(data, obj) {
-   const isFound = data.find((line)=>{
-        return line.SKU == obj.SKU && obj.Section == line.Section
-    })
-    return isFound
-}
+
 function getkey(headers) {
     let from = headers[2].split(" ")[0]
     let to = headers[headers.length - 1].split(" ")[0]

@@ -32,7 +32,7 @@ const recursiveAsyncReadLine = function () {
                         const fileData = fs.readFileSync(values[1]).toString();
                         let lines = fileData.split("\n");
                         const headers = lines[0].split("\t");
-                        recentData = textToJSON(headers, lines.slice(1, lines.length - 1));
+                        recentData = textToJSON(headers, lines.slice(1, lines.length));
                     }
                     if (recentData == null) {
                         console.log("Error")
