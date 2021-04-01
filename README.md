@@ -11,9 +11,9 @@ Please check ```demo.mp4``` in the current folder
 ### Functionality:
 
 - Data in both the file is getting merged based on SKU
-- While merge If no SKU is found in old file then it is added in merged data
-- If SKU is found, then duplicate data is getting overwritten with new one even if the value is greater
-- Merged/Single data is saved in store and is used for further merge when new file is ingested
+- While merge, If no SKU is found in old file then it is added in merged data
+- If SKU is found, then duplicate data is getting overwritten with new one (even if the value is greater)
+- Merged/Single data is saved in store and is used for further merge, when new file is ingested
 - Written unit test cases in tests folder for utils and libs package
 - Added comments on each method
 - Almost handled all the scenarios
@@ -23,7 +23,7 @@ Please check ```demo.mp4``` in the current folder
 - I have check the text file for any invalid data but not the excel sheet
 - For generating report, data is converted into custom object, the logic is more rigid
 - Code can be more optimized
-- Due to lack of understanding some of the criteria is not handled i.e. (If this is the application’s first time encountering this SKU, use the category associated with the highest number of sales in the most recent month in the given file. However, once an item is assigned a category, the category doesn’t change, even if it’s different on a new input file)
+- Due to lack of understanding, some of the criteria is not handled i.e. (If this is the application’s first time encountering this SKU, use the category associated with the highest number of sales in the most recent month in the given file. However, once an item is assigned a category, the category doesn’t change, even if it’s different on a new input file)
 
 ### How to run
 
