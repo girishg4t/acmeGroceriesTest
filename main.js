@@ -22,30 +22,35 @@ const recursiveAsyncReadLine = function () {
             let values = line.split(" ")
             switch (values[0].trim()) {
                 case "ingest": {
-                    const e = values[1].split(".")
-                    let extention = e[e.length - 1]
-                    let recentData = "";
-                    if (extention == "xlsx") {
-                        var workbook = XLSX.readFile(values[1]);
-                        recentData = XLSX.utils.sheet_to_json(workbook.Sheets["Sales"]);
-                    } else {
-                        const fileData = fs.readFileSync(values[1]).toString();
-                        let lines = fileData.split("\n");
-                        const headers = lines[0].split("\t");
-                        recentData = textToJSON(headers, lines.slice(1, lines.length));
-                    }
-                    if (recentData == null) {
+                    try {
+                        const e = values[1].split(".")
+                        let extention = e[e.length - 1]
+                        let recentData = "";
+                        if (extention == "xlsx") {
+                            var workbook = XLSX.readFile(values[1]);
+                            recentData = XLSX.utils.sheet_to_json(workbook.Sheets["Sales"]);
+                        } else {
+                            const fileData = fs.readFileSync(values[1]).toString();
+                            let lines = fileData.split("\n");
+                            const headers = lines[0].split("\t");
+                            recentData = textToJSON(headers, lines.slice(1, lines.length));
+                        }
+                        if (recentData == null) {
+                            console.log("Error")
+                            break
+                        }
+                        if (store.get("data")) {
+                            let finalData = mergeData(store.get("data"), recentData)
+                            store.set("data", finalData)
+                        } else {
+                            store.set("data", recentData)
+                        }
+                        console.log("Success")
+                        break;
+                    } catch (err) {
                         console.log("Error")
                         break
                     }
-                    if (store.get("data")) {
-                        let finalData = mergeData(store.get("data"), recentData)
-                        store.set("data", finalData)
-                    } else {
-                        store.set("data", recentData)
-                    }
-                    console.log("Success")
-                    break;
                 }
                 case "summary": {
                     const result = getSummary(values.splice(1, values.length));
@@ -56,7 +61,7 @@ const recursiveAsyncReadLine = function () {
                     console.log(`Produce - Total Units: ${result.totalUnits} , Total Gross Sales: ${result.grossSales.toFixed(2)}`)
                     break;
                 }
-                case "generate_report": {                   
+                case "generate_report": {
                     generateRepot(values[1])
                     break;
                 }
@@ -78,19 +83,19 @@ rl.on("close", function () {
 });
 
 function getSummary(values) {
-    let filteredGrocery = filterGroceryBy(store.get("data"),
+    let grocerySummary = filterGroceryBy(store.get("data"),
         { "Section": values[0] });
 
     let year = values[1]
     let month = values[2]
     let yearMonth = year + "-" + month
-    filteredGrocery = mapDataBy(filteredGrocery, {
+    grocerySummary = mapDataBy(grocerySummary, {
         "Units": yearMonth + " Units",
         "GrossSales": yearMonth + " Gross Sales"
     })
-    let totalUnits = getTotal(filteredGrocery, "Units");
+    let totalUnits = getTotal(grocerySummary, "Units");
 
-    let grossSales = getTotal(filteredGrocery, "GrossSales")
+    let grossSales = getTotal(grocerySummary, "GrossSales")
 
     return {
         totalUnits,

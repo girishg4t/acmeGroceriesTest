@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var { filterGroceryBy, mapDataBy, createCustomObjects } = require("../lib");
+var { filterGroceryBy, mapDataBy, createCustomObjects, mergeData } = require("../lib");
 var mocha = require('mocha')
 var it = mocha.it
 var describe = mocha.describe
@@ -70,6 +70,40 @@ var data = [
         '2019-5 Gross Sales': '8410.74'
     }
 ]
+let newData = [
+    {
+        "2018-11 Units": 818,
+        "2018-11 Gross Sales": 1595.1,
+        "2018-12 Units": 834,
+        "2018-12 Gross Sales": 1626.3,
+        "2019-1 Units": 876,
+        "2019-1 Gross Sales": 1708.2,
+        "2019-2 Units": 867,
+        "2019-2 Gross Sales": 1690.66,
+        "2019-3 Units": 910,
+        "2019-3 Gross Sales": 1774.5,
+        "2019-4 Units": 910,
+        "2019-4 Gross Sales": 1774.5,
+        "Section": 'International',
+        "SKU": 1009966
+    },
+    {
+        "2018-11 Units": 818,
+        "2018-11 Gross Sales": 1595.1,
+        "2018-12 Units": 834,
+        "2018-12 Gross Sales": 1626.3,
+        "2019-1 Units": 876,
+        "2019-1 Gross Sales": 1708.2,
+        "2019-2 Units": 867,
+        "2019-2 Gross Sales": 1690.66,
+        "2019-3 Units": 910,
+        "2019-3 Gross Sales": 1774.5,
+        "2019-4 Units": 910,
+        "2019-4 Gross Sales": 1774.5,
+        "Section": 'International',
+        "SKU": 1009967
+    }
+]
 describe("Verify libs", function () {
     it("filter data by category", function () {
         let filteredGrocery = filterGroceryBy(data,
@@ -93,5 +127,9 @@ describe("Verify libs", function () {
         expect(result[1].Year).to.equal('2019')
         expect(result[1].Month).to.equal('1')
     });
-
+    it("Check if data is getting merged", function () {
+        let result = mergeData(data, newData)
+        expect(result.length).to.equal(5);
+        expect(result[3]["2019-2 Gross Sales"]).to.equal(1690.66);        
+    })
 });
