@@ -8,7 +8,7 @@ Please check ```demo.mp4``` in the current folder
 - Files should be uploaded in sequence i.e. if there are 2 file need to ingested for January-June 2018 and February-July 2018 then January file should be submitted first
 - All ingested files are taken from current(root) folder of the project and new is also generated in same folder
 
-### Fungtionality:
+### Functionality:
 
 - Data in both the file is getting merged based on SKU
 - While merge If no SKU is found in old file then it is added in merged data
