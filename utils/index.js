@@ -1,6 +1,11 @@
 const { Parser } = require('json2csv');
 const fs = require('fs');
 
+/**
+ * Convert text into json
+ * @param {head of the text file} headers 
+ * @param {data of the text file} lines 
+ */
 function textToJSON(headers, lines) {
     var result = [];
     let isError = false
@@ -31,12 +36,23 @@ function getkey(headers) {
     return from + " " + to
 }
 
+/**
+ * Get the total based on field passed
+ * @param {data to be reduced} arr 
+ * @param {for which field total is calculated} field 
+ */
 function getTotal(arr, field) {
     return arr.reduce(function (prev, cur) {
         return prev + parseInt(cur[field])
     }, 0);
 }
 
+/**
+ * Create the csv file
+ * @param {array based on which csv file need to created} data 
+ * @param {name of the file} name 
+ * @param {fields need to be present in the file} opts 
+ */
 function createCsv(data, name, opts) {
     try {
         const parser = new Parser(opts);

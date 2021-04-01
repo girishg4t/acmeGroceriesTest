@@ -1,6 +1,6 @@
 
 const { textToJSON, getTotal, createCsv } = require('./utils')
-const { filterGroceryBy, mapDataBy, formatData, mergeData } = require('./lib')
+const { filterGroceryBy, mapDataBy, formatData, mergeData } = require('./libs')
 const sortBy = require('lodash.sortby');
 const store = require('store')
 const XLSX = require('xlsx')
@@ -19,18 +19,20 @@ const recursiveAsyncReadLine = function () {
     generate_report <filename>\n
     exit\n\n? `
         , function (line) {
-            let values = line.split(" ")
-            switch (values[0].trim()) {
+            let args = line.split(" ")
+            switch (args[0].trim()) {
                 case "ingest": {
                     try {
-                        const e = values[1].split(".")
+                        const e = args[1].split(".")
                         let extention = e[e.length - 1]
                         let recentData = "";
                         if (extention == "xlsx") {
-                            var workbook = XLSX.readFile(values[1]);
+                            //Read xlsx file
+                            var workbook = XLSX.readFile(args[1]);
                             recentData = XLSX.utils.sheet_to_json(workbook.Sheets["Sales"]);
                         } else {
-                            const fileData = fs.readFileSync(values[1]).toString();
+                            //Read text file
+                            const fileData = fs.readFileSync(args[1]).toString();
                             let lines = fileData.split("\n");
                             const headers = lines[0].split("\t");
                             recentData = textToJSON(headers, lines.slice(1, lines.length));
@@ -40,6 +42,7 @@ const recursiveAsyncReadLine = function () {
                             break
                         }
                         if (store.get("data")) {
+                            //merge if data is already ingested
                             let finalData = mergeData(store.get("data"), recentData)
                             store.set("data", finalData)
                         } else {
@@ -53,7 +56,8 @@ const recursiveAsyncReadLine = function () {
                     }
                 }
                 case "summary": {
-                    const result = getSummary(values.splice(1, values.length));
+                    //Get the total of units and gross sales
+                    const result = getSummary(args.splice(1, args.length));
                     if (result.grossSales == 0 && result.totalUnits == 0) {
                         console.log("No data available")
                         break
@@ -62,7 +66,8 @@ const recursiveAsyncReadLine = function () {
                     break;
                 }
                 case "generate_report": {
-                    generateRepot(values[1])
+                    //Generate the report
+                    generateRepot(args[1])
                     break;
                 }
                 case "exit":
@@ -82,12 +87,16 @@ rl.on("close", function () {
     process.exit(0);
 });
 
-function getSummary(values) {
+/**
+ * Get the summary base on criteria
+ * @param {* param require to get the summary} args 
+ */
+function getSummary(args) {
     let grocerySummary = filterGroceryBy(store.get("data"),
-        { "Section": values[0] });
+        { "Section": args[0] });
 
-    let year = values[1]
-    let month = values[2]
+    let year = args[1]
+    let month = args[2]
     let yearMonth = year + "-" + month
     grocerySummary = mapDataBy(grocerySummary, {
         "Units": yearMonth + " Units",
@@ -103,7 +112,10 @@ function getSummary(values) {
     }
 }
 
-
+/**
+ * Generate the csv file in the given format
+ * @param {name for the file to be created} name 
+ */
 function generateRepot(name) {
     let mappedData = formatData(store.get("data"))
     let filteredData = sortBy(mappedData, ["SKU", "Year", "Month"])

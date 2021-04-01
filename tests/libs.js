@@ -1,5 +1,5 @@
 var expect = require("chai").expect;
-var { filterGroceryBy, mapDataBy, createCustomObjects, mergeData } = require("../lib");
+var { filterGroceryBy, mapDataBy, createCustomObjects, mergeData } = require("../libs");
 var mocha = require('mocha')
 var it = mocha.it
 var describe = mocha.describe
