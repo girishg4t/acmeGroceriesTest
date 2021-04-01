@@ -53,10 +53,10 @@ function createCustomObjects(row) {
         var n = keys[i].split(/-| /)
         newObj.Year = n[0]
         newObj.Month = n[1]
-        newObj[n.splice(2, n.length).join("")] = row[keys[i]]
+        newObj[n.splice(2, n.length).join("").trim()] = parseFloat(row[keys[i]]).toFixed(2);
         i++
         n = keys[i].split(/-| /)
-        newObj[n.splice(2, n.length).join("")] = row[keys[i]]
+        newObj[n.splice(2, n.length).join("").trim()] = parseFloat(row[keys[i]]).toFixed(2);
         newObj.SKU = parseInt(row.SKU)
         newObj.Category = row.Section
         output.push(newObj)

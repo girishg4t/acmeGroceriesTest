@@ -18,8 +18,8 @@ describe("Verify utils", function () {
         let lines = data.split("\n");
         const headers = lines[0].split("\t");
         var result = textToJSON(headers, lines.slice(1, lines.length))
-        console.log(result)
         expect(result.length).to.equal(4);
+        expect(result[3].Section).to.equal("Produce");
         expect(result[3].SKU.trim()).to.equal("1041002");
         expect(result[3]["2019-5 Gross Sales"]).to.equal("8410.74");        
     })

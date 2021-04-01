@@ -122,7 +122,7 @@ describe("Verify libs", function () {
         expect(filteredGrocery[0]['GrossSales']).to.equal('1708.2');
     });
     it("Create custom object", function () {
-        let result = createCustomObjects(data[0])
+        let result = createCustomObjects(data[0])       
         expect(result.length).to.equal(6);
         expect(result[1].Year).to.equal('2019')
         expect(result[1].Month).to.equal('1')

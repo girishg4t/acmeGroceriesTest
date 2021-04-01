@@ -4,7 +4,7 @@
   "description": "",
   "main": "todo.js",
   "scripts": {
-    "test": "mocha ./tests/lib.js",
+    "test": "mocha ./tests/*.js",
     "start": "node main.js"
   },
   "author": "",

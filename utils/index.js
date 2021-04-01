@@ -18,8 +18,9 @@ function textToJSON(headers, lines) {
                     isError = true
                     break;
                 }
+                currentline[j] = parseFloat(currentline[j]).toFixed(2)
             }
-            obj[headers[j]] = currentline[j];
+            obj[headers[j]] = currentline[j]
         }
         if (isError) {
             result = null
@@ -43,7 +44,7 @@ function getkey(headers) {
  */
 function getTotal(arr, field) {
     return arr.reduce(function (prev, cur) {
-        return prev + parseInt(cur[field])
+        return prev + parseFloat(cur[field])
     }, 0);
 }
 
